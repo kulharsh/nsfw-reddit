@@ -1,3 +1,9 @@
+'''
+A script to download content from a specific subreddit. 
+Loops multiple times to get older and older content with the before option in the pushshift api. Sleep is added so as
+not to overwhelm the pushshift servers. 
+Saves the downloaded json in mongo for further use. 
+'''
 import requests 
 import json
 import pymongo

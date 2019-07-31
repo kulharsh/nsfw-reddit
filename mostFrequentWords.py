@@ -1,3 +1,7 @@
+'''
+A script to retrieve all reddit top level comments. 
+It also follows it up by fitting a CountVectorizer on the text to determine the most frequent words used in nsfw (over_18) posts
+'''
 import pymongo
 import nltk
 from nltk.tokenize import word_tokenize
