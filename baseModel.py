@@ -9,8 +9,31 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.regularizers import l1
+from keras.regularizers import l2
 
 import numpy as np
+def dense_embedding_model():
+	return tf.keras.Sequential([
+	tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+	#tf.keras.layers.Flatten(),
+	tf.keras.layers.GlobalAveragePooling1D(),
+	tf.keras.layers.Dense(6, activation='relu'),
+	tf.keras.layers.Dense(1, activation='sigmoid')
+	])
+
+def dense_embedding_conv_model():
+
+	return tf.keras.Sequential([
+	tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+	#tf.keras.layers.Flatten(),
+	tf.keras.layers.Conv1D(128, 5, activation='relu'),
+	tf.keras.layers.GlobalAveragePooling1D(),
+	tf.keras.layers.Dense(6, activation='relu', kernel_regularizer=l2(0.01)),
+	tf.keras.layers.Dense(1, activation='sigmoid')
+	])
+
+
 training_sentences, testing_sentences, ytrain, ytest = getRedditData()
 print('Data load complete...')
 print(len(training_sentences))
@@ -38,13 +61,8 @@ testing_sequences = tokenizer.texts_to_sequences(testing_sentences)
 testing_padded = pad_sequences(testing_sequences, maxlen = max_length, truncating=trunc_type)
 print("Converting to sequences complete.")
 
-model = tf.keras.Sequential([
-	tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
-	#tf.keras.layers.Flatten(),
-	tf.keras.layers.GlobalAveragePooling1D(),
-	tf.keras.layers.Dense(6, activation='relu'),
-	tf.keras.layers.Dense(1, activation='sigmoid')
-	])
+#model = dense_embedding_model()
+model = dense_embedding_conv_model()
 print('Model created')
 
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
@@ -52,5 +70,3 @@ model.summary()
 
 num_epochs = 10
 model.fit(padded, ytrain, epochs=num_epochs, validation_data=(testing_padded, ytest))
-
-
